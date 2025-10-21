@@ -25,6 +25,8 @@ import argparse
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Tuple, List
+import warnings
+import logging
 
 import numpy as np
 from scipy.interpolate import interp1d
@@ -37,6 +39,19 @@ import matplotlib.pyplot as plt
 from spectres import spectres
 
 # ----------------------------- Config & Types -----------------------------
+
+def configure_warnings(suppress: bool = False):
+"""Optionally silence common library warnings for cleaner CLI output."""
+if not suppress:
+return
+# Python warnings
+warnings.filterwarnings("ignore")
+for cat in (FutureWarning, UserWarning, RuntimeWarning):
+warnings.filterwarnings("ignore", category=cat)
+# Matplotlib chatter
+logging.getLogger("matplotlib").setLevel(logging.ERROR)
+# Numpy runtime warnings (invalid/overflow/divide)
+np.seterr(all="ignore")
 
 np.random.seed(1)  # reproducibility
 
