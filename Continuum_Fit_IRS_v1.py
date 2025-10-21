@@ -12,7 +12,7 @@ reference script:
 - GCS3 overlay in panel (b) and (c), with 0.68 τ scaling.
 - Optool-modeled silicate (olivine + pyroxene) combination uses λ<13.5 and λ≥13.5 piecewise
   with tail multipliers fixed to 1.0 (matching the reference code's use of "*1.").
-- Ice: Pure_H2O_15K scaled by 21 and locally continuum-subtracted; Pure_H2O_160K scaled by 2
+- Ice: Pure_H2O_15K scaled by 21 and baseline-corrected; Pure_H2O_160K scaled by 2
   and smoothed (box=10). Combined ice = 15K(corrected) + 160K(smoothed).
 - Produces a 4-panel PDF.
 
