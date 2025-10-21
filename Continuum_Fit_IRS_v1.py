@@ -217,6 +217,7 @@ def run_pipeline(
     ax.plot(spec.wave, spec.flux, "k-", lw=1, label=f"{target_name} IRS Spectrum")
     ax.set_xlim(5.0, 30.0)
     ax.set_ylim(spec.flux.min(), spec.flux.max())
+    ax.set_yscale("log")
     ax.text(28.0, 10.0, "(a)", fontsize=26)
     ax.tick_params(axis="both", direction="in", top=True, right=True, labelbottom=False)
     ax.minorticks_on()
@@ -239,6 +240,7 @@ def run_pipeline(
     ax.plot(spec.wave, spec.flux, "k-", lw=1, label=f"{target_name} IRS Spectrum")
     ax.set_xlim(5.0, 30.0)
     ax.set_ylim(spec.flux.min(), spec.flux.max())
+    ax.set_yscale("log")
     ax.errorbar(xp0, yp0, yp0e, fmt="ro", ecolor="r", elinewidth=0.5, markersize=2.5, label="Fitting points")
     ax.plot(x_all_a, y_fit_a, "g--", label="Polynomial deg. 6 (refine A)")
     ax.fill_between(x_all_a, y_fit_a - y_std_a, y_fit_a + y_std_a, alpha=0.2, label="Uncertainty")
@@ -269,6 +271,7 @@ def run_pipeline(
     ax.plot(spec.wave, spec.flux, "k-", lw=1, label=f"{target_name} IRS Spectrum")
     ax.set_xlim(5.0, 30.0)
     ax.set_ylim(spec.flux.min(), spec.flux.max())
+    ax.set_yscale("log")
     ax.plot(x_all_b, y_fit_b, "g--", label="Polynomial deg. 6 (refine B)")
     ax.fill_between(x_all_b, y_fit_b - y_std_b, y_fit_b + y_std_b, alpha=0.2, label="Uncertainty")
 
@@ -300,7 +303,7 @@ def run_pipeline(
     ax.tick_params(axis="both", direction="in", top=True, right=True)
     ax.minorticks_on()
 
-    # Panel (d): τ spectrum (silicate-corrected) + water ice components
+    # Panel (d): optical depth spectrum (silicate-subtracted) + water ice components
     ax = axs[3]
 
     # optical depth of target after continuum (use refine B)
@@ -372,7 +375,7 @@ def run_pipeline(
     ax.set_xlabel(r"Wavelength [$\mu$m]")
     ax.set_ylabel(r"Optical depth")
     ax.set_xlim(5.0, 22.0)
-    ax.set_ylim((H2O15_sm + H2O160_sm).max(), -0.2)
+    ax.set_ylim(tau_sil_corr.max(), -0.2)
     ax.tick_params(axis="both", direction="in", top=True, right=True)
     ax.minorticks_on()
     ax.text(20.6, 0.8, "(d)", fontsize=26)
