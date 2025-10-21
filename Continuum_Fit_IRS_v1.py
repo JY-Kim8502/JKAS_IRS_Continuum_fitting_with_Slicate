@@ -252,7 +252,7 @@ def run_pipeline(
     ax.minorticks_on()
     ax.legend(loc="upper left", fontsize=16)
 
-    # Panel (c): second refined scale + GCS3 + Y-only silicates
+    # Panel (c): second refined scale + Optool-modeled silicates
     scale_refine_b = [1.0, 1.07, 1.91, 1.5, 1.4, 1.22, 1.15]
     x_all_b, y_fit_b, y_std_b, _ = poly_continuum_with_bootstrap(
         wave=spec.wave, flux=spec.flux, flux_err=spec.flux_err,
@@ -319,7 +319,7 @@ def run_pipeline(
         s = np.argsort(wave)
         return np.sort(wave), tau_lab[s]
 
-    # Pure H2O 15K (amorphous) — scale 21 and smooth(box=10), then local poly subtraction
+    # Pure H2O 15K (amorphous) — scale 21 and smooth(box=10), then baseline correction
     pure15 = [p for p in ice_files if p.name.startswith("Pure_H2O_15K")]
     if not pure15:
         raise FileNotFoundError("No Pure_H2O_15K* file found in ice_dir")
@@ -328,8 +328,8 @@ def run_pipeline(
     H2O15_on_target = spectres(x_train_b, w15[m_band], t15[m_band])
     H2O15_on_target = np.nan_to_num(H2O15_on_target * 21.0)
 
-    # local polynomial subtraction (2nd order) on ice τ
-    def local_poly_subtract(w: np.ndarray, t: np.ndarray, deg: int = 2) -> np.ndarray:
+    # baseline correction (2nd order) on pure H2O ice spectrum at 15K
+    def baseline_poly(w: np.ndarray, t: np.ndarray, deg: int = 2) -> np.ndarray:
         ind1 = (w >= 5.0) & (w <= 5.2)
         ind2 = (w >= 8.5) & (w <= 9.0)
         ind3 = (w >= 19.0) & (w <= 25.0)
@@ -340,7 +340,7 @@ def run_pipeline(
         trend = model.predict(w[:, None]).ravel()
         return t - trend
 
-    H2O15_corr = local_poly_subtract(x_train_b, H2O15_on_target, deg=2)
+    H2O15_corr = baseline_poly(x_train_b, H2O15_on_target, deg=2)
 
     # Crystalline H2O 160K — scale 2 and smooth(box=10)
     crystalline160 = [p for p in ice_files if p.name.startswith("Pure_H2O_160K")]
@@ -390,11 +390,13 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--lab-y", required=True, type=Path, help="Path to YL lab silicate file (4 cols, skiprows=1)")
     p.add_argument("--ice-dir", required=True, type=Path, help="Directory containing ice lab data txt files")
     p.add_argument("--out", required=True, type=Path, help="Output PDF path")
+    p.add_argument("--suppress-warnings", action="store_true", help="Silence most library warnings and numpy runtime warnings")
     return p.parse_args()
 
 
 def main():
     args = parse_args()
+    configure_warnings(args.suppress_warnings)
     run_pipeline(
         target_name=args.target_name,
         spec_path=args.spectrum,
