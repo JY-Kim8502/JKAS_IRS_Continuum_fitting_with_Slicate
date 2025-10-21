@@ -213,6 +213,12 @@ def run_pipeline(
 
     # Figure & Panel (a)
     fig, axs = plt.subplots(nrows=4, ncols=1, figsize=(15, 20), sharex=False)
+    scale_initial = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    x_all00, y_fit00, y_std00, _ = poly_continuum_with_bootstrap(
+        wave=spec.wave, flux=spec.flux, flux_err=spec.flux_err,
+        degree=6, guess_mode=True, windows=MIR_WINDOWS, guess_scale_factors=scale_initial, n_bootstrap=100
+    )
+  
     ax = axs[0]
     ax.plot(spec.wave, spec.flux, "k-", lw=1, label=f"{target_name} IRS Spectrum")
     ax.set_xlim(5.0, 30.0)
