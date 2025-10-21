@@ -221,6 +221,7 @@ def run_pipeline(
   
     ax = axs[0]
     ax.plot(spec.wave, spec.flux, "k-", lw=1, label=f"{target_name} IRS Spectrum")
+    ax.plot(x_all00, y_fit00, "g--", label="Polynomial deg. 6")
     ax.set_xlim(5.0, 30.0)
     ax.set_ylim(spec.flux.min(), spec.flux.max())
     ax.set_yscale("log")
@@ -229,12 +230,13 @@ def run_pipeline(
     ax.minorticks_on()
     ax.legend(loc="upper left", fontsize=16)
 
-    # Panel (b): initial continuum (guess mode Y) + first refined + GCS3 overlay
     x_all0, y_fit0g, y_std0g, (xp0, yp0, yp0e) = poly_continuum_with_bootstrap(
         wave=spec.wave, flux=spec.flux, flux_err=spec.flux_err,
         degree=6, guess_mode=True, windows=MIR_WINDOWS, n_bootstrap=100
     )
-
+    ax.errorbar(xp0, yp0, yp0e, fmt="ro", ecolor="r", elinewidth=0.5, markersize=2.5, label="Fitting points")
+  
+    # Panel (b): initial continuum (guess mode Y) + first refined + GCS3 overlay
     # first refined scale (matches provided script)
     scale_refine_a = [1.0, 1.18, 1.62, 1.42, 1.28, 1.18, 1.15]
     x_all_a, y_fit_a, y_std_a, _ = poly_continuum_with_bootstrap(
@@ -247,8 +249,7 @@ def run_pipeline(
     ax.set_xlim(5.0, 30.0)
     ax.set_ylim(spec.flux.min(), spec.flux.max())
     ax.set_yscale("log")
-    ax.errorbar(xp0, yp0, yp0e, fmt="ro", ecolor="r", elinewidth=0.5, markersize=2.5, label="Fitting points")
-    ax.plot(x_all_a, y_fit_a, "g--", label="Polynomial deg. 6 (refine A)")
+    ax.plot(x_all_a, y_fit_a, "g--", label="Polynomial deg. 6")
     ax.fill_between(x_all_a, y_fit_a - y_std_a, y_fit_a + y_std_a, alpha=0.2, label="Uncertainty")
 
     # GCS3 overlay (panel b)
@@ -278,7 +279,7 @@ def run_pipeline(
     ax.set_xlim(5.0, 30.0)
     ax.set_ylim(spec.flux.min(), spec.flux.max())
     ax.set_yscale("log")
-    ax.plot(x_all_b, y_fit_b, "g--", label="Polynomial deg. 6 (refine B)")
+    ax.plot(x_all_b, y_fit_b, "g--", label="Polynomial deg. 6")
     ax.fill_between(x_all_b, y_fit_b - y_std_b, y_fit_b + y_std_b, alpha=0.2, label="Uncertainty")
 
     # GCS3 overlay (panel c)
